@@ -33,6 +33,18 @@ const siteSettingsSchema = new mongoose.Schema({
     pass: String,
     from: String,
   },
+  stockSync: {
+    enabled: { type: Boolean, default: false },
+    intervalMinutes: { type: Number, default: 30 },
+    lastSyncAt: Date,
+    lastSyncResult: {
+      updated: Number,
+      failed: Number,
+      total: Number,
+      matched: Number,
+      duration: Number,
+    },
+  },
 }, { timestamps: true });
 
 siteSettingsSchema.statics.getSettings = async function () {

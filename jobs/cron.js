@@ -34,4 +34,30 @@ cron.schedule('*/5 * * * *', async () => {
   }
 });
 
+// Stock sync from accszone.com - checks every minute if auto-sync is due
+cron.schedule('* * * * *', async () => {
+  try {
+    const SiteSettings = require('../models/SiteSettings');
+    const settings = await SiteSettings.getSettings();
+
+    if (!settings.stockSync || !settings.stockSync.enabled) return;
+
+    const interval = (settings.stockSync.intervalMinutes || 30) * 60 * 1000;
+    const lastSync = settings.stockSync.lastSyncAt;
+
+    if (!lastSync || (Date.now() - new Date(lastSync).getTime()) >= interval) {
+      console.log('Stock sync: starting auto-sync...');
+      const stockSyncService = require('../services/stockSyncService');
+      const result = await stockSyncService.runSync('auto');
+      if (result.error) {
+        console.error('Stock sync failed:', result.error);
+      } else {
+        console.log(`Stock sync: updated ${result.updated}/${result.matched} products in ${(result.duration / 1000).toFixed(1)}s`);
+      }
+    }
+  } catch (err) {
+    console.error('Cron error (stock sync):', err.message);
+  }
+});
+
 console.log('Cron jobs started');

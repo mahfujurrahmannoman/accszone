@@ -82,6 +82,12 @@ const apiKeyController = require('../../controllers/admin/apiKeyController');
 router.get('/api-keys', apiKeyController.index);
 router.post('/api-keys/:id/toggle', apiKeyController.toggle);
 
+// Stock Sync
+const stockSyncController = require('../../controllers/admin/stockSyncController');
+router.get('/stock-sync', stockSyncController.index);
+router.post('/stock-sync/trigger', stockSyncController.triggerSync);
+router.post('/stock-sync/settings', stockSyncController.updateSettings);
+
 // Settings
 const settingsController = require('../../controllers/admin/settingsController');
 router.get('/settings', settingsController.index);
